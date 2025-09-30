@@ -332,8 +332,9 @@
   // Optional “email instead” fallback (pre-populated mailto)
   function openMailtoWithQuote() {
     const quoteURL = buildHashURL();
-    const subject='New quote from Cost Calculator';
-    const body=`Quote link: ${quoteURL}`;
+    const quote URL=`${quoteURL}`;
+    const subject='Question about a quote';
+    const body=`My Quote URL: ${quoteURL}`;
     if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(quoteURL).catch(()=>{}); }
     location.href = `mailto:hi@speedyheadshots.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
