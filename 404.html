@@ -22,6 +22,7 @@
   .btn { appearance:none; border:1.5px solid var(--accent); background:#fff; color:var(--accent-ink); padding:8px 14px; border-radius:10px; cursor:pointer; font-weight:600; }
   .btn:active { transform:translateY(1px); }
   .card { background:#fff; border:1px solid var(--ring); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; }
+  /* Tabs */
   .tabs { display:flex; border-bottom:2px solid var(--ring); margin-bottom:18px; }
   .tab { flex:1; text-align:center; padding:10px 0; background:#f4f4f4; color:var(--muted); font-weight:600; cursor:pointer; border:none; }
   .tab[aria-selected="true"] { background:#fff; color:var(--ink); border-bottom:2px solid var(--accent); font-weight:700; }
@@ -46,8 +47,7 @@
   .when-inline { display:flex; align-items:center; gap:6px; }
   .date-box { display:flex; align-items:center; gap:8px; margin-left:auto; padding:4px 6px; border-radius:8px; }
   .date-box[aria-disabled="true"] { opacity:.6; cursor:pointer; }
-
-  /* === Three-column options row with separators === */
+  /* Three-column options row with separators */
   .options3 {
     display:grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -55,16 +55,16 @@
     margin-top:10px;
     border:1px solid var(--ring);
     border-radius:10px;
-    overflow:hidden; /* to clip separator lines */
+    overflow:hidden;
   }
   .options3 .col {
     display:flex; align-items:center; gap:8px; padding:10px 12px; background:#fff;
-    min-height:44px;  /* uniform height */
+    min-height:44px;
   }
-  .options3 .col + .col { border-left:1px solid var(--ring); } /* separators */
+  .options3 .col + .col { border-left:1px solid var(--ring); }
   .options3 .col label { font-weight:600; font-size:.95rem; }
   .options3 input[type="number"] { max-width:120px; }
-
+  /* Toast */
   .toast { position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:#111; color:#fff; padding:8px 14px; border-radius:10px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(-4px); }
 </style>
@@ -108,7 +108,6 @@
       </div>
       <div id="team-min-error" class="error" style="display:none">minimum quantity is 4 team members</div>
 
-      <!-- Three-column row -->
       <div class="options3">
         <div class="col">
           <label for="team-extra-retouch">Extra retouched images</label>
@@ -156,14 +155,13 @@
         </select>
       </label>
 
-      <!-- Three-column row -->
       <div class="options3">
         <div class="col">
           <label for="ind-extra-retouch">Extra retouched images</label>
           <input id="ind-extra-retouch" type="number" min="0" step="1" value="0" />
         </div>
         <div class="col">
-          <span class="muted">Included with package shown below</span>
+          <span class="muted">Package includes shown below</span>
         </div>
         <div class="col">
           <label class="switch" for="ind-add-hst"><input id="ind-add-hst" type="checkbox"> Add HST (13%)</label>
@@ -187,6 +185,7 @@
 <div id="toast" class="toast">Link copied</div>
 
 <script>
+  // --- Pricing constants ---
   const HST = 0.13;
   const EXTRA = 25;
 
@@ -202,29 +201,33 @@
     "model-editorial": { name: "Editorial", price: 675, included: 5 }
   };
 
-  function perPersonRate(n){ if(n>=20) return 125; if(n>=10) return 150; if(n>=4) return 175; return null; }
+  const perPersonRate = (n)=> n>=20?125 : n>=10?150 : n>=4?175 : null;
 
+  // --- Helpers ---
   const $ = s => document.querySelector(s);
   const money = n => "$" + n.toFixed(2);
   const toast = $("#toast");
   const showToast = t => { toast.textContent = t; toast.classList.add("show"); setTimeout(()=>toast.classList.remove("show"),1500); };
 
-  // Tabs
-  const tabTeam=$("#tab-team"), tabInd=$("#tab-ind");
-  const panelTeam=$("#panel-team"), panelInd=$("#panel-ind");
+  // --- Tabs ---
+  const tabTeam = $("#tab-team"), tabInd = $("#tab-ind");
+  const panelTeam = $("#panel-team"), panelInd = $("#panel-ind");
   function showTeam(){ tabTeam.setAttribute("aria-selected","true"); tabInd.setAttribute("aria-selected","false"); panelTeam.hidden=false; panelInd.hidden=true; }
   function showInd(){ tabInd.setAttribute("aria-selected","true"); tabTeam.setAttribute("aria-selected","false"); panelInd.hidden=false; panelTeam.hidden=true; }
   tabTeam.addEventListener("click", showTeam);
   tabInd.addEventListener("click", showInd);
 
-  // When / Date
+  // --- When / Date (click wrapper to enable + focus) ---
   const whenUnknown=$("#when-unknown"), whenSpecific=$("#when-specific"), whenDate=$("#when-date"), whenFlex=$("#when-flex"), dateBox=$("#date-box");
   function updateWhen(){ const spec=whenSpecific.checked; whenDate.disabled=!spec; whenFlex.disabled=!spec; dateBox.setAttribute("aria-disabled", String(!spec)); }
   whenUnknown.addEventListener("change", updateWhen);
   whenSpecific.addEventListener("change", updateWhen);
-  dateBox.addEventListener("click", () => { if(!whenSpecific.checked){ whenSpecific.checked=true; whenUnknown.checked=false; updateWhen(); } setTimeout(()=>whenDate.focus(),0); });
+  dateBox.addEventListener("click", () => {
+    if (!whenSpecific.checked) { whenSpecific.checked=true; whenUnknown.checked=false; updateWhen(); }
+    setTimeout(()=>whenDate.focus(), 0);
+  });
 
-  // Individual / Modeling calc
+  // --- Individual / Modeling calc ---
   const indPkgSel=$("#ind-package"), indExtra=$("#ind-extra-retouch"), indHst=$("#ind-add-hst");
   const indPkgName=$("#ind-package-name"), indIncluded=$("#ind-included"), indSubtotal=$("#ind-subtotal"), indExtraOut=$("#ind-extra"), indHstOut=$("#ind-hst"), indTotal=$("#ind-total");
   function calcIndividual(){
@@ -248,17 +251,24 @@
     indHst.addEventListener(ev,calcIndividual);
   });
 
-  // Team calc (+ auto day-rate at 23)
+  // --- Team calc (auto day-rate at 23+) ---
   const teamCount=$("#team-count"), teamBadge=$("#team-count-badge");
   const teamExtra=$("#team-extra-retouch"), teamHst=$("#team-add-hst"), teamDay=$("#team-dayrate");
   const teamRateBasis=$("#team-rate-basis"), teamIncluded=$("#team-included"), teamSubtotal=$("#team-subtotal"), teamExtraOut=$("#team-extra"), teamHstOut=$("#team-hst"), teamTotal=$("#team-total"), teamErr=$("#team-min-error");
   function calcTeam(){
     const n=Math.max(0,parseInt(teamCount.value||"4",10));
     teamBadge.textContent=String(n);
-    if(n<4){ teamErr.style.display="block"; teamRateBasis.textContent="minimum quantity is 4 team members"; teamIncluded.textContent="0"; teamSubtotal.textContent=money(0); teamExtraOut.textContent=money(0); teamHstOut.textContent=money(0); teamTotal.textContent=money(0); return; }
-    teamErr.style.display="none";
-    // Auto-toggle day rate at 23+
-    if(n>=23) teamDay.checked=true;
+    if(n<4){
+      teamErr.style.display="block";
+      teamRateBasis.textContent="minimum quantity is 4 team members";
+      teamIncluded.textContent="0";
+      teamSubtotal.textContent=money(0);
+      teamExtraOut.textContent=money(0);
+      teamHstOut.textContent=money(0);
+      teamTotal.textContent=money(0);
+      return;
+    } else { teamErr.style.display="none"; }
+    if(n>=23) teamDay.checked=true; // auto-switch at 23+
     const useDay=teamDay.checked;
     const extraCount=Math.max(0,parseInt(teamExtra.value||"0",10));
     const extras=extraCount*EXTRA;
@@ -282,35 +292,90 @@
     teamDay.addEventListener(ev,calcTeam);
   });
 
-  <script>
+  // --- Hash-sharing (Option B) ---
+  // URL-safe Base64 (no padding)
   const toB64 = (str) => btoa(unescape(encodeURIComponent(str))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   const fromB64 = (b64) => decodeURIComponent(escape(atob((b64.replace(/-/g,'+').replace(/_/g,'/')) + '==='.slice((b64.length%4)||4))));
 
-  function buildState(){ /* same as above */ }
-  function applyState(s){ /* same as above */ }
+  function buildState(){
+    const mode = panelTeam.hidden ? 'ind' : 'team';
+    const s = { m: mode };
+    s.w = whenSpecific.checked ? 'date' : 'unknown';
+    if (s.w === 'date') {
+      s.d = whenDate.value || '';
+      s.f = whenFlex.checked ? 1 : 0;
+    }
+    if (mode === 'team') {
+      s.tc = +teamCount.value;
+      s.te = +teamExtra.value || 0;
+      s.th = teamHst.checked ? 1 : 0;
+      s.td = teamDay.checked ? 1 : 0;
+    } else {
+      s.ip = indPkgSel.value;
+      s.ie = +indExtra.value || 0;
+      s.ih = indHst.checked ? 1 : 0;
+    }
+    return s;
+  }
+
+  function applyState(s){
+    (s.m === 'ind' ? showInd : showTeam)();
+    if (s.w === 'date') {
+      whenSpecific.checked = true; whenUnknown.checked = false; updateWhen();
+      if (s.d) whenDate.value = s.d;
+      whenFlex.checked = !!s.f;
+    } else {
+      whenUnknown.checked = true; whenSpecific.checked = false; updateWhen();
+    }
+    if (s.m === 'team') {
+      if (typeof s.tc === 'number') teamCount.value = Math.max(4, Math.min(50, s.tc));
+      teamExtra.value = s.te ?? 0;
+      teamHst.checked = s.th === 1;
+      teamDay.checked = s.td === 1;
+      calcTeam();
+    } else {
+      if (s.ip) indPkgSel.value = s.ip;
+      indExtra.value = s.ie ?? 0;
+      indHst.checked = s.ih === 1;
+      calcIndividual();
+    }
+  }
 
   function buildHashURL(){
     const id = toB64(JSON.stringify(buildState()));
     return `${location.origin}${location.pathname}#q=${id}`;
   }
 
-  document.querySelector('#copy-link').onclick = () => {
+  $("#copy-link").addEventListener("click", () => {
     const url = buildHashURL();
     navigator.clipboard.writeText(url).then(()=>showToast('Link copied'));
     history.replaceState({}, '', url);
-  };
-  document.querySelector('#email-link').onclick = () => {
-    const url = buildHashURL();
-    location.href = `mailto:?subject=${encodeURIComponent('SpeedyHeadshots estimate')}&body=${encodeURIComponent('View estimate: ' + url)}`;
-  };
+  });
 
-  // restore from hash
+  $("#email-link").addEventListener("click", () => {
+    const url = buildHashURL();
+    const subject = encodeURIComponent('SpeedyHeadshots estimate');
+    const body = encodeURIComponent(`View estimate: ${url}`);
+    location.href = `mailto:?subject=${subject}&body=${body}`;
+  });
+
+  // Restore from #q=... on load
   (function restoreFromHash(){
     const m = location.hash.match(/[#&]q=([^&]+)/);
     if (!m) return;
-    try { applyState(JSON.parse(fromB64(m[1]))); } catch(e){}
+    try {
+      const state = JSON.parse(fromB64(m[1]));
+      applyState(state);
+    } catch(e) { /* ignore bad state */ }
   })();
-</script>
+
+  // --- Init (Business default) ---
+  (function init(){
+    showTeam();
+    updateWhen();
+    calcIndividual();
+    calcTeam();
+  })();
 </script>
 </body>
 </html>
