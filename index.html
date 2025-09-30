@@ -7,39 +7,56 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  :root { --surface:#fafafa; --ink:#111; --muted:#686868; --ring:#e9e9ec; --accent:#2bcff3; --accent-ink:#0e5663; --err:#c62828; --radius:14px; --shadow:0 6px 18px rgba(0,0,0,.05); }
-  *{box-sizing:border-box}
-  html,body{margin:0;background:var(--surface);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:880px;margin:32px auto;padding:0 20px}
-  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-  .brand{font-weight:800;letter-spacing:.2px}.brand .dot{color:#fb958a}
-  .actions{display:flex;gap:8px}
-  .btn{appearance:none;border:1.5px solid var(--accent);background:#fff;color:var(--accent-ink);padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600}
-  .btn:active{transform:translateY(1px)}
-  .card{background:#fff;border:1px solid var(--ring);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
-  .tabs{display:flex;border-bottom:2px solid var(--ring);margin-bottom:18px}
-  .tab{flex:1;text-align:center;padding:10px 0;background:#f4f4f4;color:var(--muted);font-weight:600;cursor:pointer;border:none}
-  .tab[aria-selected="true"]{background:#fff;color:var(--ink);border-bottom:2px solid var(--accent);font-weight:700}
-  label .hint{display:block;font-size:.8rem;color:var(--muted);margin-top:2px}
-  select,input[type="number"],input[type="date"]{width:100%;padding:10px;border-radius:10px;border:1px solid var(--ring);background:#fff;font-size:1rem}
-  .switch{display:flex;align-items:center;gap:6px;font-size:.95rem}
-  .summary{background:#fff;border:1px solid var(--ring);border-radius:12px;padding:14px;margin-top:16px}
-  .row2{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:6px}
-  .money{font-variant-numeric:tabular-nums}.total{font-size:1.6rem;font-weight:800}.muted{color:var(--muted)}
-  .error{color:var(--err);font-weight:600;font-size:.9rem}.hr{height:1px;background:#eee;margin:12px 0}
-  .slider-wrap{display:flex;align-items:center;gap:10px;margin:8px 0}input[type="range"]{flex:1}
-  .qty-badge{min-width:44px;text-align:center;font-weight:700;border:1px solid var(--ring);border-radius:8px;padding:6px 8px;background:#fff}
-  fieldset{border:1px solid var(--ring);border-radius:12px;padding:10px;margin-bottom:14px}
-  legend{padding:0 6px;color:var(--muted);font-size:.9rem}
-  .when-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}.when-inline{display:flex;align-items:center;gap:6px}
-  .date-box{display:flex;align-items:center;gap:8px;margin-left:auto;padding:4px 6px;border-radius:8px}
-  .date-box[aria-disabled="true"]{opacity:.6;cursor:pointer}
-  .options3{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;margin-top:10px;border:1px solid var(--ring);border-radius:10px;overflow:hidden}
-  .options3 .col{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;min-height:44px}
-  .options3 .col + .col{border-left:1px solid var(--ring)}.options3 .col label{font-weight:600;font-size:.95rem}
-  .options3 input[type="number"]{max-width:120px}
-  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#111;color:#fff;padding:8px 14px;border-radius:10px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+  :root {
+    --surface:#fafafa; --ink:#111; --muted:#686868;
+    --ring:#e9e9ec; --accent:#2bcff3; --accent-ink:#0e5663;
+    --err:#c62828; --radius:14px; --shadow:0 6px 18px rgba(0,0,0,.05);
+  }
+  * { box-sizing: border-box; }
+  html,body { margin:0; background:var(--surface); color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+  .wrap { max-width:880px; margin:32px auto; padding:0 20px; }
+  header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .brand { font-weight:800; letter-spacing:.2px; }
+  .brand .dot { color:#fb958a; }
+  .actions { display:flex; gap:8px; }
+  .btn { appearance:none; border:1.5px solid var(--accent); background:#fff; color:var(--accent-ink); padding:8px 14px; border-radius:10px; cursor:pointer; font-weight:600; }
+  .btn:active { transform:translateY(1px); }
+  .card { background:#fff; border:1px solid var(--ring); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; }
+  /* Tabs */
+  .tabs { display:flex; border-bottom:2px solid var(--ring); margin-bottom:18px; }
+  .tab { flex:1; text-align:center; padding:10px 0; background:#f4f4f4; color:var(--muted); font-weight:600; cursor:pointer; border:none; }
+  .tab[aria-selected="true"] { background:#fff; color:var(--ink); border-bottom:2px solid var(--accent); font-weight:700; }
+  select, input[type="number"], input[type="date"] { width:100%; padding:10px; border-radius:10px; border:1px solid var(--ring); background:#fff; font-size:1rem; }
+  .switch { display:flex; align-items:center; gap:6px; font-size:.95rem; }
+  .summary { background:#fff; border:1px solid var(--ring); border-radius:12px; padding:14px; margin-top:16px; }
+  .row2 { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; margin-bottom:6px; }
+  .money { font-variant-numeric:tabular-nums; }
+  .total { font-size:1.6rem; font-weight:800; }
+  .muted { color:var(--muted); }
+  .error { color:var(--err); font-weight:600; font-size:.9rem; }
+  .hr { height:1px; background:#eee; margin:12px 0; }
+  .slider-wrap { display:flex; align-items:center; gap:10px; margin:8px 0; }
+  input[type="range"] { flex:1; }
+  .qty-badge { min-width:44px; text-align:center; font-weight:700; border:1px solid var(--ring); border-radius:8px; padding:6px 8px; background:#fff; }
+  fieldset { border:1px solid var(--ring); border-radius:12px; padding:10px; margin-bottom:14px; }
+  legend { padding:0 6px; color:var(--muted); font-size:.9rem; }
+  .when-row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+  .when-inline { display:flex; align-items:center; gap:6px; }
+  .date-box { display:flex; align-items:center; gap:8px; margin-left:auto; padding:4px 6px; border-radius:8px; }
+  .date-box[aria-disabled="true"] { opacity:.6; cursor:pointer; }
+  /* Three-column options row with separators */
+  .options3 { display:grid; grid-template-columns: 1fr 1fr 1fr; align-items:center; margin-top:10px; border:1px solid var(--ring); border-radius:10px; overflow:hidden; }
+  .options3 .col { display:flex; align-items:center; gap:8px; padding:10px 12px; background:#fff; min-height:44px; }
+  .options3 .col + .col { border-left:1px solid var(--ring); }
+  .options3 .col label { font-weight:600; font-size:.95rem; }
+  .options3 input[type="number"] { max-width:120px; }
+  /* Solid blue CTA inside summary */
+  .cta-wrap { margin-top:20px; text-align:center; }
+  .cta-btn { display:inline-block; background:var(--accent); color:#fff !important; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; font-size:1.05rem; }
+  .cta-alt { display:block; margin-top:8px; font-size:.9rem; }
+  /* Toast */
+  .toast { position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:#111; color:#fff; padding:8px 14px; border-radius:10px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(-4px); }
 </style>
 </head>
 <body>
@@ -58,6 +75,7 @@
       <button class="tab" id="tab-ind" aria-controls="panel-ind" aria-selected="false">Individual / Modeling</button>
     </div>
 
+    <!-- WHEN -->
     <fieldset>
       <legend>When</legend>
       <div class="when-row" role="radiogroup" aria-label="When">
@@ -102,16 +120,15 @@
         <div class="row2"><div class="muted">HST</div><div id="team-hst" class="money" style="text-align:right">$0.00</div></div>
         <div class="hr"></div>
         <div class="row2"><div class="total">Total</div><div id="team-total" class="total money" style="text-align:right">$0.00</div></div>
-        <div style="margin-top:20px; text-align:center;">
-        <p style="margin-bottom:12px; font-size:0.95rem;">
-            Call / text <a href="tel:13473661342">347-366-1342</a><br>
+
+        <!-- CTA inside TEAM summary -->
+        <div class="cta-wrap">
+          <p style="margin-bottom:12px; font-size:0.95rem;">
+            Call / text <a href="tel:13473661342">347-366-1342</a> ·
             Email <a href="mailto:hi@speedyheadshots.com">hi@speedyheadshots.com</a>
           </p>
-          <a id="book-now" href="https://www.speedyheadshots.com/contact" target="_blank" rel="noopener"
-             style="display:inline-block; background:var(--accent); color:#fff; font-weight:700;
-                    padding:12px 28px; border-radius:10px; text-decoration:none; font-size:1.05rem;">
-            Book Now
-          </a>
+          <a href="https://www.speedyheadshots.com/contact" target="_blank" rel="noopener" class="cta-btn book-now-btn">Book Now</a>
+          <a href="#" class="cta-alt" id="email-fallback-team">Prefer email? Click to draft with your quote link</a>
         </div>
       </div>
     </div>
@@ -160,16 +177,15 @@
         <div class="row2"><div class="muted">HST</div><div id="ind-hst" class="money" style="text-align:right">$0.00</div></div>
         <div class="hr"></div>
         <div class="row2"><div class="total">Total</div><div id="ind-total" class="total money" style="text-align:right">$0.00</div></div>
-        <div style="margin-top:20px; text-align:center;">
-        <p style="margin-bottom:12px; font-size:0.95rem;">
-            Call / text <a href="tel:13473661342">347-366-1342</a><br>
+
+        <!-- CTA inside IND summary -->
+        <div class="cta-wrap">
+          <p style="margin-bottom:12px; font-size:0.95rem;">
+            Call / text <a href="tel:13473661342">347-366-1342</a> ·
             Email <a href="mailto:hi@speedyheadshots.com">hi@speedyheadshots.com</a>
           </p>
-          <a id="book-now" href="https://www.speedyheadshots.com/contact" target="_blank" rel="noopener"
-             style="display:inline-block; background:var(--accent); color:#fff; font-weight:700;
-                    padding:12px 28px; border-radius:10px; text-decoration:none; font-size:1.05rem;">
-            Book Now
-          </a>
+          <a href="https://www.speedyheadshots.com/contact" target="_blank" rel="noopener" class="cta-btn book-now-btn">Book Now</a>
+          <a href="#" class="cta-alt" id="email-fallback-ind">Prefer email? Click to draft with your quote link</a>
         </div>
       </div>
     </div>
@@ -179,7 +195,7 @@
 <div id="toast" class="toast">Link copied</div>
 
 <script>
-  // --- Pricing constants ---
+  // --- Pricing constants & data ---
   const HST = 0.13, EXTRA = 25;
   const IND_PACKAGES = {
     "corp-mini": { name: "Corporate — Mini", price: 250, included: 1 },
@@ -248,17 +264,14 @@
   }
   ["change","input"].forEach(ev=>{ teamCount.addEventListener(ev,calcTeam); teamExtra.addEventListener(ev,calcTeam); teamHst.addEventListener(ev,calcTeam); teamDay.addEventListener(ev,calcTeam); });
 
-  // --- Hash sharing (Option B) FIXED ---
+  // --- Hash sharing (Option B) ---
   // URL-safe Base64
   const toB64 = (str) =>
     btoa(unescape(encodeURIComponent(str)))
       .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-
   const fromB64 = (b64) => {
-    // add correct padding
-    const len = b64.length;
-    const pad = (4 - (len % 4)) % 4;
-    const withPad = b64 + '='.repeat(pad);
+    const len=b64.length; const pad=(4-(len%4))%4;
+    const withPad=b64 + '='.repeat(pad);
     return decodeURIComponent(escape(atob(withPad.replace(/-/g,'+').replace(/_/g,'/'))));
   };
 
@@ -270,7 +283,6 @@
     else { s.ip = indPkgSel.value; s.ie = +indExtra.value || 0; s.ih = indHst.checked ? 1 : 0; }
     return s;
   }
-
   function applyState(s){
     (s.m === 'ind' ? showInd : showTeam)();
     if (s.w === 'date') { whenSpecific.checked=true; whenUnknown.checked=false; updateWhen(); if(s.d) whenDate.value=s.d; whenFlex.checked=!!s.f; }
@@ -288,19 +300,47 @@
   (function restoreFromHash(){
     const m = location.hash.match(/[#&]q=([^&]+)/);
     if (!m) return;
-    try {
-      const state = JSON.parse(fromB64(m[1]));
-      applyState(state);
-      restoredFromHash = true;
-    } catch(e) { /* ignore */ }
+    try { applyState(JSON.parse(fromB64(m[1]))); restoredFromHash = true; } catch(e){}
   })();
 
-  // Share buttons
   function buildHashURL(){ const id = toB64(JSON.stringify(buildState())); return `${location.origin}${location.pathname}#q=${id}`; }
-  $("#copy-link").addEventListener("click", () => { const url=buildHashURL(); navigator.clipboard.writeText(url).then(()=>showToast('Link copied')); history.replaceState({},'',url); });
-  $("#email-link").addEventListener("click", () => { const url=buildHashURL(); const subject=encodeURIComponent('SpeedyHeadshots estimate'); const body=encodeURIComponent(`View estimate: ${url}`); location.href=`mailto:?subject=${subject}&body=${body}`; });
 
-  // Init defaults only if not restored
+  $("#copy-link").addEventListener("click", () => {
+    const url=buildHashURL();
+    navigator.clipboard.writeText(url).then(()=>showToast('Link copied'));
+    history.replaceState({},'',url);
+  });
+  $("#email-link").addEventListener("click", () => {
+    const url=buildHashURL();
+    const subject=encodeURIComponent('SpeedyHeadshots estimate');
+    const body=encodeURIComponent(`View estimate: ${url}`);
+    location.href=`mailto:?subject=${subject}&body=${body}`;
+  });
+
+  // --- Book Now: open contact with quote details + copy to clipboard ---
+  function openContactWithQuote() {
+    const quoteURL = buildHashURL();
+    const contact = new URL('https://www.speedyheadshots.com/contact');
+    contact.searchParams.set('quote', quoteURL);
+    contact.searchParams.set('subject', 'New quote from Cost Calculator');
+    contact.searchParams.set('message', `Quote link: ${quoteURL}`);
+    if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(quoteURL).catch(()=>{}); }
+    window.open(contact.toString(), '_blank', 'noopener');
+  }
+  document.querySelectorAll('.book-now-btn').forEach(btn => btn.addEventListener('click', (e)=>{ e.preventDefault(); openContactWithQuote(); }));
+
+  // Optional “email instead” fallback (pre-populated mailto)
+  function openMailtoWithQuote() {
+    const quoteURL = buildHashURL();
+    const subject='New quote from Cost Calculator';
+    const body=`Quote link: ${quoteURL}`;
+    if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(quoteURL).catch(()=>{}); }
+    location.href = `mailto:hi@speedyheadshots.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+  $("#email-fallback-team")?.addEventListener('click', (e)=>{ e.preventDefault(); openMailtoWithQuote(); });
+  $("#email-fallback-ind")?.addEventListener('click', (e)=>{ e.preventDefault(); openMailtoWithQuote(); });
+
+  // --- Init defaults only if not restored ---
   (function init(){
     if (!restoredFromHash) {
       showTeam();
@@ -309,33 +349,6 @@
       calcTeam();
     }
   })();
-</script>
-<script>
-(function(){
-  const btn = document.getElementById('book-now');
-  if (!btn) return;
-
-  btn.addEventListener('click', function(e){
-    e.preventDefault();
-
-    // Use your existing function; fall back to current URL if not present
-    const quoteURL = (typeof buildHashURL === 'function') ? buildHashURL() : location.href;
-
-    // Build contact URL with params
-    const contact = new URL('https://www.speedyheadshots.com/contact');
-    contact.searchParams.set('quote', quoteURL);
-    contact.searchParams.set('subject', 'New quote from Cost Calculator');
-    contact.searchParams.set('message', `Quote link: ${quoteURL}`);
-
-    // Copy quote URL so the user can paste it if needed
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(quoteURL).catch(()=>{});
-    }
-
-    // Open in new tab/window
-    window.open(contact.toString(), '_blank', 'noopener');
-  });
-})();
 </script>
 </body>
 </html>
