@@ -103,11 +103,11 @@
         <div class="hr"></div>
         <div class="row2"><div class="total">Total</div><div id="team-total" class="total money" style="text-align:right">$0.00</div></div>
         <div style="margin-top:20px; text-align:center;">
-          <p style="margin-bottom:12px; font-size:0.95rem;">
+        <p style="margin-bottom:12px; font-size:0.95rem;">
             Call / text <a href="tel:13473661342">347-366-1342</a><br>
             Email <a href="mailto:hi@speedyheadshots.com">hi@speedyheadshots.com</a>
           </p>
-          <a href="https://www.speedyheadshots.com/contact" target="_blank" rel="noopener"
+          <a id="book-now" href="https://www.speedyheadshots.com/contact" target="_blank" rel="noopener"
              style="display:inline-block; background:var(--accent); color:#fff; font-weight:700;
                     padding:12px 28px; border-radius:10px; text-decoration:none; font-size:1.05rem;">
             Book Now
@@ -161,11 +161,11 @@
         <div class="hr"></div>
         <div class="row2"><div class="total">Total</div><div id="ind-total" class="total money" style="text-align:right">$0.00</div></div>
         <div style="margin-top:20px; text-align:center;">
-          <p style="margin-bottom:12px; font-size:0.95rem;">
+        <p style="margin-bottom:12px; font-size:0.95rem;">
             Call / text <a href="tel:13473661342">347-366-1342</a><br>
             Email <a href="mailto:hi@speedyheadshots.com">hi@speedyheadshots.com</a>
           </p>
-          <a href="https://www.speedyheadshots.com/contact" target="_blank" rel="noopener"
+          <a id="book-now" href="https://www.speedyheadshots.com/contact" target="_blank" rel="noopener"
              style="display:inline-block; background:var(--accent); color:#fff; font-weight:700;
                     padding:12px 28px; border-radius:10px; text-decoration:none; font-size:1.05rem;">
             Book Now
@@ -309,6 +309,33 @@
       calcTeam();
     }
   })();
+</script>
+<script>
+(function(){
+  const btn = document.getElementById('book-now');
+  if (!btn) return;
+
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+
+    // Use your existing function; fall back to current URL if not present
+    const quoteURL = (typeof buildHashURL === 'function') ? buildHashURL() : location.href;
+
+    // Build contact URL with params
+    const contact = new URL('https://www.speedyheadshots.com/contact');
+    contact.searchParams.set('quote', quoteURL);
+    contact.searchParams.set('subject', 'New quote from Cost Calculator');
+    contact.searchParams.set('message', `Quote link: ${quoteURL}`);
+
+    // Copy quote URL so the user can paste it if needed
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(quoteURL).catch(()=>{});
+    }
+
+    // Open in new tab/window
+    window.open(contact.toString(), '_blank', 'noopener');
+  });
+})();
 </script>
 </body>
 </html>
