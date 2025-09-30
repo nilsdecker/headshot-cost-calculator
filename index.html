@@ -282,12 +282,107 @@
     teamDay.addEventListener(ev,calcTeam);
   });
 
-  // Share
-  $("#copy-link").addEventListener("click",()=>{navigator.clipboard.writeText(location.href).then(()=>showToast("Link copied"));});
-  $("#email-link").addEventListener("click",()=>{const subject=encodeURIComponent("SpeedyHeadshots estimate");const body=encodeURIComponent(`View estimate: ${location.href}`);location.href=`mailto:?subject=${subject}&body=${body}`;});
+  <script>
+  // --- URL-safe Base64 helpers ---
+  const toB64 = (str) => btoa(unescape(encodeURIComponent(str)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/,'');
+  const fromB64 = (b64) => decodeURIComponent(escape(atob(
+    b64.replace(/-/g,'+').replace(/_/g,'/') + '==='.slice((b64.length%4)||4)
+  )));
 
-  // Init
-  (function init(){ showTeam(); updateWhen(); calcIndividual(); calcTeam(); })();
+  // Collect the current UI state into a minimal object
+  function buildState() {
+    const mode = document.querySelector('#panel-team').hidden ? 'ind' : 'team';
+    const state = { m: mode };
+
+    // when
+    state.w = document.querySelector('#when-specific').checked ? 'date' : 'unknown';
+    if (state.w === 'date') {
+      state.d = document.querySelector('#when-date').value || '';
+      state.f = document.querySelector('#when-flex').checked ? 1 : 0;
+    }
+
+    if (mode === 'team') {
+      state.tc = +document.querySelector('#team-count').value;
+      state.te = +document.querySelector('#team-extra-retouch').value || 0;
+      state.th = document.querySelector('#team-add-hst').checked ? 1 : 0;
+      state.td = document.querySelector('#team-dayrate').checked ? 1 : 0;
+    } else {
+      state.ip = document.querySelector('#ind-package').value;
+      state.ie = +document.querySelector('#ind-extra-retouch').value || 0;
+      state.ih = document.querySelector('#ind-add-hst').checked ? 1 : 0;
+    }
+    return state;
+  }
+
+  // Apply a state object back into the UI
+  function applyState(s) {
+    if (s.m === 'ind') { document.querySelector('#tab-ind').click(); } else { document.querySelector('#tab-team').click(); }
+
+    // when
+    if (s.w === 'date') {
+      document.querySelector('#when-specific').checked = true;
+      document.querySelector('#when-unknown').checked = false;
+      document.querySelector('#when-date').disabled = false;
+      document.querySelector('#when-flex').disabled = false;
+      if (s.d) document.querySelector('#when-date').value = s.d;
+      document.querySelector('#when-flex').checked = s.f === 1;
+    } else {
+      document.querySelector('#when-unknown').checked = true;
+      document.querySelector('#when-specific').checked = false;
+      document.querySelector('#when-date').disabled = true;
+      document.querySelector('#when-flex').disabled = true;
+    }
+
+    if (s.m === 'team') {
+      if (typeof s.tc === 'number') document.querySelector('#team-count').value = Math.max(4, Math.min(50, s.tc));
+      document.querySelector('#team-extra-retouch').value = s.te ?? 0;
+      document.querySelector('#team-add-hst').checked = s.th === 1;
+      document.querySelector('#team-dayrate').checked = s.td === 1;
+      calcTeam();
+    } else {
+      if (s.ip) document.querySelector('#ind-package').value = s.ip;
+      document.querySelector('#ind-extra-retouch').value = s.ie ?? 0;
+      document.querySelector('#ind-add-hst').checked = s.ih === 1;
+      calcIndividual();
+    }
+  }
+
+  // Build a pretty /quotes/:id URL from current state
+  function buildQuoteURL() {
+    const state = buildState();
+    const encoded = toB64(JSON.stringify(state));
+    const base = `${location.origin}${location.pathname}`.replace(/\/quotes\/?.*$/,'');
+    return `${base.replace(/\/$/,'')}/quotes/${encoded}`;
+  }
+
+  // Replace your existing share handlers with these:
+  document.querySelector('#copy-link').onclick = () => {
+    const url = buildQuoteURL();
+    navigator.clipboard.writeText(url).then(()=>showToast('Link copied'));
+    history.replaceState({}, '', url);
+  };
+  document.querySelector('#email-link').onclick = () => {
+    const url = buildQuoteURL();
+    const subject = encodeURIComponent('SpeedyHeadshots estimate');
+    const body = encodeURIComponent(`View estimate: ${url}`);
+    location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
+  // On load, if path looks like /quotes/:id, decode and apply it
+  (function restoreFromPath() {
+    const m = location.pathname.match(/\/quotes\/([^\/#?]+)/);
+    if (m && m[1]) {
+      try {
+        const state = JSON.parse(fromB64(m[1]));
+        applyState(state);
+      } catch(e) { /* ignore bad state */ }
+    }
+  })();
+
+  // IMPORTANT for GitHub Pages deep links:
+  // Duplicate your index.html as 404.html so /quotes/... loads the app.
+</script>
 </script>
 </body>
 </html>
