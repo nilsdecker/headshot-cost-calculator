@@ -264,15 +264,16 @@
   }
   ["change","input"].forEach(ev=>{ teamCount.addEventListener(ev,calcTeam); teamExtra.addEventListener(ev,calcTeam); teamHst.addEventListener(ev,calcTeam); teamDay.addEventListener(ev,calcTeam); });
 
-  // --- Hash sharing (Option B) ---
-  // URL-safe Base64
-  const toB64 = (str) =>
-    btoa(unescape(encodeURIComponent(str)))
-      .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  // --- Robust quote link builder (query + hash) ---
+  // URL-safe Base64 (ASCII JSON only; no escape/unescape needed)
+  const toB64 = (str) => {
+    const raw = btoa(str);
+    return raw.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  };
   const fromB64 = (b64) => {
-    const len=b64.length; const pad=(4-(len%4))%4;
-    const withPad=b64 + '='.repeat(pad);
-    return decodeURIComponent(escape(atob(withPad.replace(/-/g,'+').replace(/_/g,'/'))));
+    const pad = b64.length % 4 ? 4 - (b64.length % 4) : 0;
+    const base = b64.replace(/-/g,'+').replace(/_/g,'/') + '='.repeat(pad);
+    return atob(base);
   };
 
   function buildState(){
@@ -283,6 +284,14 @@
     else { s.ip = indPkgSel.value; s.ie = +indExtra.value || 0; s.ih = indHst.checked ? 1 : 0; }
     return s;
   }
+
+  function buildQuoteURL(){
+    const id = toB64(JSON.stringify(buildState()));
+    const base = `${location.origin}${location.pathname}`;
+    // include both ?q= and #q= so it survives link wrappers that strip fragments
+    return `${base}?q=${id}#q=${id}`;
+  }
+
   function applyState(s){
     (s.m === 'ind' ? showInd : showTeam)();
     if (s.w === 'date') { whenSpecific.checked=true; whenUnknown.checked=false; updateWhen(); if(s.d) whenDate.value=s.d; whenFlex.checked=!!s.f; }
@@ -296,30 +305,43 @@
     }
   }
 
+  // Restore from hash first, then query (?q=) as fallback, then normalize to #q=
   let restoredFromHash = false;
-  (function restoreFromHash(){
-    const m = location.hash.match(/[#&]q=([^&]+)/);
-    if (!m) return;
-    try { applyState(JSON.parse(fromB64(m[1]))); restoredFromHash = true; } catch(e){}
+  (function restoreFromLink(){
+    let id = null;
+    const hashMatch = location.hash.match(/[#&]q=([^&]+)/);
+    if (hashMatch) { id = hashMatch[1]; restoredFromHash = true; }
+    if (!id) {
+      const qs = new URLSearchParams(location.search);
+      if (qs.has('q')) id = qs.get('q');
+    }
+    if (!id) return;
+
+    try {
+      const state = JSON.parse(fromB64(id));
+      applyState(state);
+      // normalize URL to hash format only
+      const base = `${location.origin}${location.pathname}`;
+      history.replaceState({}, '', `${base}#q=${id}`);
+    } catch(e) { /* ignore bad payload */ }
   })();
 
-  function buildHashURL(){ const id = toB64(JSON.stringify(buildState())); return `${location.origin}${location.pathname}#q=${id}`; }
-
+  // Copy / Email
   $("#copy-link").addEventListener("click", () => {
-    const url=buildHashURL();
+    const url=buildQuoteURL();
     navigator.clipboard.writeText(url).then(()=>showToast('Link copied'));
     history.replaceState({},'',url);
   });
   $("#email-link").addEventListener("click", () => {
-    const url=buildHashURL();
+    const url=buildQuoteURL();
     const subject=encodeURIComponent('SpeedyHeadshots estimate');
     const body=encodeURIComponent(`View estimate: ${url}`);
     location.href=`mailto:?subject=${subject}&body=${body}`;
   });
 
-  // --- Book Now: open contact with quote details + copy to clipboard ---
+  // Book Now → open contact with quote details + copy to clipboard
   function openContactWithQuote() {
-    const quoteURL = buildHashURL();
+    const quoteURL = buildQuoteURL();
     const contact = new URL('https://www.speedyheadshots.com/contact');
     contact.searchParams.set('quote', quoteURL);
     contact.searchParams.set('subject', 'New quote from Cost Calculator');
@@ -331,17 +353,16 @@
 
   // Optional “email instead” fallback (pre-populated mailto)
   function openMailtoWithQuote() {
-    const quoteURL = buildHashURL();
-    const quote URL=`${quoteURL}`;
-    const subject='Question about a quote';
-    const body=`My Quote URL: ${quoteURL}`;
+    const quoteURL = buildQuoteURL();
+    const subject='New quote from Cost Calculator';
+    const body=`Quote link: ${quoteURL}`;
     if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(quoteURL).catch(()=>{}); }
     location.href = `mailto:hi@speedyheadshots.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
   $("#email-fallback-team")?.addEventListener('click', (e)=>{ e.preventDefault(); openMailtoWithQuote(); });
   $("#email-fallback-ind")?.addEventListener('click', (e)=>{ e.preventDefault(); openMailtoWithQuote(); });
 
-  // --- Init defaults only if not restored ---
+  // Init defaults only if not restored via link
   (function init(){
     if (!restoredFromHash) {
       showTeam();
